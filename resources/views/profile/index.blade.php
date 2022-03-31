@@ -1,9 +1,9 @@
 @extends('layouts.app')
 
 @section('content')
-    @includeWhen($breadcrumb,'layouts.breadcrumb.breadcrumb',$breadcrumb)
-
     <section class="container min-vh-100">
+        @includeWhen($breadcrumb,'layouts.breadcrumb.breadcrumb',$breadcrumb)
+
         <div class="row" dir="rtl">
             <div class="col-12 col-lg-3 d-flex">
                 @include('layouts.profile.sidebar')
