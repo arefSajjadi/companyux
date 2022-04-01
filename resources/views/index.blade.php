@@ -3,7 +3,7 @@
 @section('content')
     <section class="container py-5">
         <div class="col-lg-6 offset-lg-3 text-center">
-            <h1 id="Slogan">یک شِرکتٌ چند تَجرٌبه</h1>
+            <h1 id="Slogan">یک شرکت و چند تجربه</h1>
             <form action="{{route('search.result')}}" method="get">
                 <div class="input-group mt-3">
                     <button class="btn btn-outline-secondary" id="search">
