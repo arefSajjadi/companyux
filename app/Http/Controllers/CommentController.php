@@ -2,17 +2,19 @@
 
 namespace App\Http\Controllers;
 
+use App\DB\CommentRepo;
 use App\Http\Requests\StoreCommentRequest;
 use App\Http\Requests\UpdateCommentRequest;
 use App\Models\Comment;
 use App\Models\Company;
-use App\Models\Job;
 use Illuminate\Support\Facades\Auth;
 
 class CommentController extends Controller
 {
+
     public function index()
     {
+        $commentDB = new CommentRepo;
         $breadcrumb = [
             'items' => [
                 [
@@ -25,9 +27,9 @@ class CommentController extends Controller
             ]
         ];
 
-        $jobs = Job::query()->orderBy('title')->get();
+        $jobs = $commentDB->getJobs();
 
-        $comments = Auth::user()->comments()->paginate(10);
+        $comments = $commentDB->getComment(Auth::user());
 
         return view('comments.index', [
             'breadcrumb' => $breadcrumb,
@@ -38,6 +40,8 @@ class CommentController extends Controller
 
     public function create(Company $company)
     {
+        $commentDB = new CommentRepo;
+
         $breadcrumb = [
             'items' => [
                 [
@@ -58,7 +62,7 @@ class CommentController extends Controller
             ]
         ];
 
-        $jobs = Job::query()->orderBy('title')->get();
+        $jobs = $commentDB->getJobs(); //db
 
         return view('comments.create', [
             'breadcrumb' => $breadcrumb,
@@ -69,48 +73,31 @@ class CommentController extends Controller
 
     public function store(Company $company, StoreCommentRequest $request)
     {
-
-        Auth::user()->comments()->create([
-            'job_id' => $request->job_id,
-            'company_id' => $company->id,
-            'display_name' => $request->display_name,
-            'comment' => $request->comment,
-            'status' => Comment::STATUS_WAITING,
-            'type' => $request->type,
-            'hire' => (bool)$request->hire,
-            'requested_wage' => intval(preg_replace('/\D/', '', $request->requested_wage)),
-            'received_wage' => intval(preg_replace('/\D/', '', $request->received_wage))
-        ]);
-
+        $commentDB = new CommentRepo;
+        //send data to ShoteRepo class for create new comment
+        $commentDB->storeComment(Auth::user(), $request, $company);
+    
         session()->flash('comment_store');
         return redirect()->route('comments.index');
     }
 
-    public function update(UpdateCommentRequest $request, Company $company, Comment $comment)
+    public function update(UpdateCommentRequest $request,  Comment $comment)
     {
-        $this->authorize('update', $comment);
+        $commentDB = new CommentRepo;
 
-        $comment->update([
-            'job_id' => $request->job_id,
-            'display_name' => $request->display_name,
-            'comment' => $request->comment,
-            'status' => Comment::STATUS_WAITING,
-            'type' => $request->type,
-            'hire' => (bool)$request->hire,
-            'requested_wage' => intval(preg_replace('/\D/', '', $request->requested_wage)),
-            'received_wage' => intval(preg_replace('/\D/', '', $request->received_wage))
-        ]);
+        $this->authorize('update', $comment);
+        $commentDB->updateComment( $request, $comment);
 
         session()->flash('comment_update');
         return back();
     }
 
-    public function destroy(Company $company, Comment $comment)
+    public function destroy(Comment $comment)
     {
+        $commentDB = new CommentRepo;
         $this->authorize('delete', $comment);
 
-        $comment->delete();
-
+        $commentDB->delete($comment);
         session()->flash('comment_destroy');
 
         return back();
