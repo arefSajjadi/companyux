@@ -2,16 +2,16 @@
 
 namespace App\Http\Controllers;
 
+use App\DB\CompanyRepo;
 use App\Http\Requests\StoreCompanyRequest;
 use App\Models\Company;
-use App\Models\Industry;
-use Illuminate\Database\Eloquent\Builder;
 use Illuminate\Support\Facades\Auth;
 
 class CompanyController extends Controller
 {
     public function index()
     {
+        $companyRepo = new CompanyRepo;
         $breadcrumb = [
             'items' => [
                 [
@@ -20,10 +20,7 @@ class CompanyController extends Controller
             ]
         ];
 
-        $companies = Company::query()->where('status', Company::STATUS_ACTIVE)
-            ->when(request()->filled('industry'), function (Builder $query) {
-                $query->where('industry_id', request('industry'));
-            })->orderBy('created_at')->paginate(30);
+        $companies = $companyRepo->getCompanies();
 
         return view('companies.index', [
             'breadcrumb' => $breadcrumb,
@@ -33,19 +30,9 @@ class CompanyController extends Controller
 
     public function myCompanies()
     {
-        $breadcrumb = [
-            'items' => [
-                [
-                    'title' => 'حساب کاربری',
-                    'link' => route('profile.dashboard'),
-                ],
-                [
-                    'title' => 'لیست درخواست های افزودن شرکت',
-                ],
-            ]
-        ];
-
-        $companies = Auth::user()->companies()->paginate(10);
+        $companyRepo = new CompanyRepo;
+        $breadcrumb = $this->breadcrumb('حساب کاربری',  route('profile.dashboard'), 'لیست درخواست های افزودن شرکت');
+        $companies = $companyRepo->getUserCompanies(Auth::user());
 
         return view('companies.myCompanies', [
             'breadcrumb' => $breadcrumb,
@@ -55,57 +42,33 @@ class CompanyController extends Controller
 
     public function create()
     {
-        $breadcrumb = [
-            'items' => [
-                [
-                    'title' => 'حساب کاربری',
-                    'link' => route('profile.dashboard'),
-                ],
-                [
-                    'title' => 'درخواست ثبت شرکت',
-                ],
-            ]
-        ];
+        $companyRepo = new CompanyRepo;
 
-        $industries = Industry::all();
+        $breadcrumb = $this->breadcrumb('حساب کاربری',  route('profile.dashboard'), 'درخواست ثبت شرکت');
+
+        $industries = $companyRepo->getIndustry();
         return view('companies.create', [
             'breadcrumb' => $breadcrumb,
             'industries' => $industries,
         ]);
     }
 
+
+
     public function store(StoreCompanyRequest $request)
     {
-        /** @var company $company */
-        $company = Auth::user()->companies()->create([
-            'establishment_at' => $request->establishment_at,
-            'industry_id' => $request->industry_id,
-            'name' => $request->name,
-            'brand' => $request->brand,
-            'telephone' => $request->telephone,
-            'url' => $request->url,
-            'employees' => $request->employees,
-            'status' => Company::STATUS_WAITING
-        ]);
+        $companyRepo = new CompanyRepo;
+        $company = $companyRepo->storeCompany($request, Auth::user());
 
         session()->flash('company_store', ['title' => $company->name]);
 
         return redirect()->route('companies.myCompanies');
     }
 
-    public function show(company $company)
+
+    public function show(Company $company)
     {
-        $breadcrumb = [
-            'items' => [
-                [
-                    'title' => 'شرکت ها',
-                    'link' => route('companies.index')
-                ],
-                [
-                    'title' => $company->name
-                ]
-            ]
-        ];
+        $breadcrumb = $this->breadcrumb('شرکت ها',  route('companies.index'), $company->name);
 
         return view('companies.show', [
             'breadcrumb' => $breadcrumb,
@@ -113,17 +76,34 @@ class CompanyController extends Controller
         ]);
     }
 
+
     public function destroy(company $company)
     {
+        $companyRepo = new CompanyRepo;
         $this->authorize('delete', $company);
-
         if ($company->activeComments()->count())
             abort(401);
 
-        $company->delete();
-
+        $companyRepo->deleteCompany($company);
         session()->flash('company_destroy');
 
         return back();
     }
+
+
+    protected function breadcrumb($title1, $link, $title2): array
+    {
+        return [
+            'items' => [
+                [
+                    'title' => $title1,
+                    'link' => $link
+                ],
+                [
+                    'title' => $title2
+                ]
+            ]
+        ];
+    } 
+
 }
