@@ -2,37 +2,38 @@
 
 namespace App\Http\Controllers;
 
-use App\DB\CompanyRepo;
 use App\Http\Requests\StoreCompanyRequest;
 use App\Models\Company;
+use App\Repositories\CompanyRepository;
 use Illuminate\Support\Facades\Auth;
 
 class CompanyController extends Controller
 {
+    public function __construct(CompanyRepository $companyRepository)
+    {
+        $this->repository = $companyRepository;
+    }
+
+    private CompanyRepository $repository;
+
     public function index()
     {
-        $companyRepo = new CompanyRepo;
-        $breadcrumb = [
-            'items' => [
-                [
-                    'title' => 'شرکت ها'
-                ]
-            ]
-        ];
-
-        $companies = $companyRepo->getCompanies();
+        $companies = $this->repository->getCompanies();
 
         return view('companies.index', [
-            'breadcrumb' => $breadcrumb,
+            'breadcrumb' => $this->breadcrumb(['شرکت ها']),
             'companies' => $companies
         ]);
     }
 
     public function myCompanies()
     {
-        $companyRepo = new CompanyRepo;
-        $breadcrumb = $this->breadcrumb('حساب کاربری',  route('profile.dashboard'), 'لیست درخواست های افزودن شرکت');
-        $companies = $companyRepo->getUserCompanies(Auth::user());
+        $breadcrumb = $this->breadcrumb(
+            ['حساب کاربری', route('profile.dashboard')],
+            ['لیست درخواست های افزودن شرکت']
+        );
+
+        $companies = $this->repository->getUsersProprety(Auth::user());
 
         return view('companies.myCompanies', [
             'breadcrumb' => $breadcrumb,
@@ -42,11 +43,12 @@ class CompanyController extends Controller
 
     public function create()
     {
-        $companyRepo = new CompanyRepo;
+        $breadcrumb = $this->breadcrumb(
+            ['حساب کاربری', route('profile.dashboard')],
+            ['درخواست ثبت شرکت']
+        );
 
-        $breadcrumb = $this->breadcrumb('حساب کاربری',  route('profile.dashboard'), 'درخواست ثبت شرکت');
-
-        $industries = $companyRepo->getIndustry();
+        $industries = $this->repository->getIndustry();
         return view('companies.create', [
             'breadcrumb' => $breadcrumb,
             'industries' => $industries,
@@ -57,8 +59,18 @@ class CompanyController extends Controller
 
     public function store(StoreCompanyRequest $request)
     {
-        $companyRepo = new CompanyRepo;
-        $company = $companyRepo->storeCompany($request, Auth::user());
+        $data = [
+            'establishment_at' => $request->establishment_at,
+            'industry_id' => $request->industry_id,
+            'name' => $request->name,
+            'brand' => $request->brand,
+            'telephone' => $request->telephone,
+            'url' => $request->url,
+            'employees' => $request->employees,
+            'status' => Company::STATUS_WAITING
+        ];
+
+        $company = $this->repository->store($data, Auth::user());
 
         session()->flash('company_store', ['title' => $company->name]);
 
@@ -68,8 +80,11 @@ class CompanyController extends Controller
 
     public function show(Company $company)
     {
-        $breadcrumb = $this->breadcrumb('شرکت ها',  route('companies.index'), $company->name);
-
+        $breadcrumb = $this->breadcrumb(
+            ['شرکت ها', route('companies.index')],
+            [$company->name]
+        );
+    
         return view('companies.show', [
             'breadcrumb' => $breadcrumb,
             'company' => $company
@@ -79,31 +94,27 @@ class CompanyController extends Controller
 
     public function destroy(company $company)
     {
-        $companyRepo = new CompanyRepo;
+
         $this->authorize('delete', $company);
         if ($company->activeComments()->count())
             abort(401);
 
-        $companyRepo->deleteCompany($company);
+        $this->repository->delete($company);
         session()->flash('company_destroy');
 
         return back();
     }
 
 
-    protected function breadcrumb($title1, $link, $title2): array
+    protected function breadcrumb(array ...$items): array
     {
-        return [
-            'items' => [
-                [
-                    'title' => $title1,
-                    'link' => $link
-                ],
-                [
-                    'title' => $title2
-                ]
-            ]
-        ];
-    } 
-
+        //get array of items and set them as breadcrumb items
+        foreach ($items as $key => $item) {
+            $breadcrumb['items'][$key] = [
+                'title' => $item[0],
+                'link' => $item[1] ?? null //if it was undefine set null value
+            ];
+        }
+        return $breadcrumb;
+    }
 }

@@ -1,13 +1,15 @@
 <?php
 
 
-namespace App\DB;
+namespace App\Repositories;
+
 
 use App\Models\Company;
 use App\Models\Industry;
+use App\Repositories\Interfaces\RepositoryInterface;
 use Illuminate\Contracts\Database\Eloquent\Builder;
 
-class CompanyRepo
+class CompanyRepository implements RepositoryInterface
 {
     public function getCompanies()
     {
@@ -17,7 +19,7 @@ class CompanyRepo
             })->orderBy('created_at')->paginate(30);
     }
 
-    public function getUserCompanies($user)
+    public function getUsersProprety($user)
     {
         return $user->companies()->paginate(10);
     }
@@ -28,22 +30,14 @@ class CompanyRepo
     }
 
 
-    public function storeCompany($request, $user)
+    public function store($data, $user, $relate = null)
     {
-        return $user->companies()->create([
-            'establishment_at' => $request->establishment_at,
-            'industry_id' => $request->industry_id,
-            'name' => $request->name,
-            'brand' => $request->brand,
-            'telephone' => $request->telephone,
-            'url' => $request->url,
-            'employees' => $request->employees,
-            'status' => Company::STATUS_WAITING
-        ]);
+        return $user->companies()->create($data);
     }
 
-    public function deleteCompany($company)
+    public function delete($company)
     {
         $company->delete();
     }
+    
 }
