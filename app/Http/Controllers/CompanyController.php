@@ -77,9 +77,11 @@ class CompanyController extends Controller
         return redirect()->route('companies.myCompanies');
     }
 
-
     public function show(Company $company)
     {
+        if ($company->status !== Company::STATUS_ACTIVE)
+            abort(404);
+
         $breadcrumb = $this->breadcrumb(
             ['شرکت ها', route('companies.index')],
             [$company->name]
