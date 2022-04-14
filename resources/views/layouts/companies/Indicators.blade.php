@@ -28,6 +28,6 @@
 
     <li class="list-group-item">
         نظرات :
-        {{$company->comments()->count()}}
+        {{$company->activeComments()->count()}}
     </li>
 </ul>

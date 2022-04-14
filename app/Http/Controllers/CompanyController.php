@@ -95,6 +95,9 @@ class CompanyController extends Controller
 
     public function show(company $company)
     {
+        if ($company->status !== Company::STATUS_ACTIVE)
+            abort(404);
+
         $breadcrumb = [
             'items' => [
                 [

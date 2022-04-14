@@ -4,6 +4,7 @@ namespace App\Models;
 
 use Illuminate\Database\Eloquent\Factories\HasFactory;
 use Illuminate\Database\Eloquent\Model;
+use Illuminate\Database\Eloquent\Relations\HasMany;
 
 /**
  * @property mixed id
@@ -22,8 +23,8 @@ class Job extends Model
     protected $fillable = ['title'];
 
 
-    public function comments()
+    public function comments(): HasMany
     {
-        return $this->hasMany(Commnet::class, 'job_id');
+        return $this->hasMany(Comment::class, 'job_id');
     }
 }

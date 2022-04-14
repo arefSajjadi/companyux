@@ -4,6 +4,8 @@ namespace App\Models;
 
 use Illuminate\Database\Eloquent\Factories\HasFactory;
 use Illuminate\Database\Eloquent\Model;
+use Illuminate\Database\Eloquent\Relations\BelongsTo;
+use Illuminate\Database\Eloquent\Relations\HasMany;
 use Illuminate\Database\Eloquent\SoftDeletes;
 
 /**
@@ -58,22 +60,22 @@ class Company extends Model
         return companyStatus($this->status);
     }
 
-    public function user()
+    public function user(): BelongsTo
     {
         return $this->belongsTo(User::class, 'user_id');
     }
 
-    public function industry()
+    public function industry(): BelongsTo
     {
         return $this->belongsTo(Industry::class, 'industry_id');
     }
 
-    public function comments()
+    public function comments(): HasMany
     {
         return $this->hasMany(Comment::class, 'company_id');
     }
 
-    public function activeComments()
+    public function activeComments(): HasMany
     {
         return $this->hasMany(Comment::class, 'company_id')
             ->where('status', Comment::STATUS_ACTIVE)
