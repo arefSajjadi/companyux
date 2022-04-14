@@ -3,38 +3,43 @@
 namespace App\Repositories;
 
 use App\Models\Comment;
-use App\Models\Job;
-use App\Repositories\Interfaces\RepositoryInterface;
+use App\Models\Company;
+use App\Models\User;
+use Illuminate\Database\Eloquent\Model;
 
-class CommentRepository implements RepositoryInterface
+class CommentRepository
 {
-    public function getUsersProprety($user)
+    public function store(User $user, Company $company, array $data): Model
     {
-        return $user->comments()->paginate(10);
+        return $user->comments()->create([
+            'job_id' => $data['job_id'],
+            'company_id' => $company->id,
+            'display_name' => $data['display_name'],
+            'comment' => $data['comment'],
+            'status' => Comment::STATUS_WAITING,
+            'type' => $data['type'],
+            'hire' => $data['hire'],
+            'requested_wage' => $data['requested_wage'],
+            'received_wage' => $data['received_wage']
+        ]);
     }
 
-    public function getJobs()
+    public function update(Comment $comment, array $data): bool
     {
-        return Job::query()->orderBy('title')->get();
+        return $comment->update([
+            'job_id' => $data['job_id'],
+            'display_name' => $data['display_name'],
+            'comment' => $data['comment'],
+            'status' => $data['status'],
+            'type' => $data['type'],
+            'hire' => $data['hire'],
+            'requested_wage' => $data['requested_wage'],
+            'received_wage' => $data['received_wage']
+        ]);
     }
 
-
-    public function store($data ,$user, $company =null)
-    {
-        $user->comments()->create($data);
-    }
-
-    public function updateComment(array $data, $comment)
-    {
-        $comment->update($data);
-    }
-
-
-    public function delete($comment)
+    public function delete(Comment $comment): void
     {
         $comment->delete();
     }
-
-
-    
 }
