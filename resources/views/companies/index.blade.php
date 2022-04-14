@@ -27,7 +27,7 @@
                     </div>
                     @if($companies->total() > $companies->perPage())
                         <div class="card-footer">
-                            {{$companies->links()}}
+                            {{$companies->appends(request()->input())->links()}}
                         </div>
                     @endif
                 </div>
