@@ -18,12 +18,12 @@ function isActiveRoute($routeName, $output = 'active')
     return null;
 }
 
-function loopWithPaginate($loop, $items)
+function loopWithPaginate($loop, $items): float|int
 {
     return $loop->iteration + (($items->currentPage() - 1) * $items->perPage());
 }
 
-function companyStatus(string $status)
+function companyStatus(string $status): string
 {
     return match ($status) {
         Company::STATUS_ACTIVE => 'منتشر شده',
@@ -31,7 +31,7 @@ function companyStatus(string $status)
     };
 }
 
-function commentType(string $type)
+function commentType(string $type): string
 {
     return match ($type) {
         Comment::type_employ => 'کارمند',
@@ -40,7 +40,7 @@ function commentType(string $type)
     };
 }
 
-function commentStatus(string $status)
+function commentStatus(string $status): string
 {
     return match ($status) {
         Comment::STATUS_ACTIVE => 'منتشر شده',
@@ -48,7 +48,18 @@ function commentStatus(string $status)
     };
 }
 
-function price(int $price)
+function price(int $price): string
 {
     return number_format($price) . ' تومان';
+}
+
+function breadcrumb(array ...$items): array
+{
+    foreach ($items as $key => $item) {
+        $breadcrumb['items'][$key] = [
+            'title' => $item[0],
+            'link' => $item[1] ?? null
+        ];
+    }
+    return $breadcrumb ?? [];
 }

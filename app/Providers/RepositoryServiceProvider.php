@@ -4,7 +4,9 @@ namespace App\Providers;
 
 use App\Repositories\CommentRepository;
 use App\Repositories\CompanyRepository;
-use App\Repositories\Interfaces\RepositoryInterface;
+use App\Repositories\IndustryRepository;
+use App\Repositories\JobRepository;
+use App\Repositories\UserRepository;
 use Illuminate\Support\ServiceProvider;
 
 class RepositoryServiceProvider extends ServiceProvider
@@ -14,11 +16,14 @@ class RepositoryServiceProvider extends ServiceProvider
      *
      * @return void
      */
-    public function register() 
-{
-    $this->app->bind(RepositoryInterface::class, CompanyRepository::class);
-    $this->app->bind(RepositoryInterface::class, CommentRepository::class);
- }
+    public function register()
+    {
+        $this->app->singleton('comment', CommentRepository::class);
+        $this->app->bind('company', CompanyRepository::class);
+        $this->app->bind('job', JobRepository::class);
+        $this->app->bind('user', UserRepository::class);
+        $this->app->bind('industry', IndustryRepository::class);
+    }
 
     /**
      * Bootstrap services.
