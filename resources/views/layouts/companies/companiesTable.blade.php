@@ -51,7 +51,7 @@
                     </td>
                     <td>
                         <div class="btn-group btn-group-sm" dir="ltr">
-                            @if ($company->status !== \App\Models\Company::STATUS_ACTIVE and !empty($company->reason))
+                            @if ($company->status === \App\Models\Company::STATUS_REJECT and !empty($company->reason))
                                 <a class="btn btn-outline-secondary" title="حذف" data-bs-toggle="modal"
                                    data-bs-target="#reject-reason{{$company->id}}" data-backdrop="false">
                                     <i class="bi-info-circle"></i>

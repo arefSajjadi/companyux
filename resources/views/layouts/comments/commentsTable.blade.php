@@ -52,7 +52,7 @@
                     <td>{{convert_date($comment->created_at, true)}}</td>
                     <td>
                         <div class="btn-group btn-group-sm" dir="ltr">
-                            @if ($comment->status !== \App\Models\Comment::STATUS_ACTIVE and !empty($comment->reason))
+                            @if ($comment->status === \App\Models\Comment::STATUS_REJECT and !empty($comment->reason))
                                 <a class="btn btn-outline-secondary" title="حذف" data-bs-toggle="modal"
                                    data-bs-target="#reject-reason{{$comment->id}}" data-backdrop="false">
                                     <i class="bi-info-circle"></i>
