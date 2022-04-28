@@ -51,6 +51,7 @@ class Company extends Model
 
     const STATUS_WAITING = 'waiting';
     const STATUS_ACTIVE = 'active';
+    const STATUS_REJECT = 'reject';
 
     public function getLogoAttribute(): string
     {
