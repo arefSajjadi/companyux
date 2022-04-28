@@ -23,6 +23,7 @@ use Illuminate\Database\Eloquent\SoftDeletes;
  * @property mixed status
  * @property mixed fa_status
  * @property mixed logo
+ * @property mixed reason
  * @property mixed comments
  * @property User activeComments
  * @property Industry industry
@@ -44,11 +45,13 @@ class Company extends Model
         'url',
         'employees',
         'status',
-        'logo'
+        'logo',
+        'reason'
     ];
 
     const STATUS_WAITING = 'waiting';
     const STATUS_ACTIVE = 'active';
+    const STATUS_REJECT = 'reject';
 
     public function getLogoAttribute(): string
     {

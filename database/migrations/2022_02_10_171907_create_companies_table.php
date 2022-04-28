@@ -27,6 +27,7 @@ return new class extends Migration {
             $table->integer('establishment_at')->nullable();
             $table->string('status')->default(Company::STATUS_WAITING);
             $table->text('logo')->nullable();
+            $table->text('reason')->nullable();
 
             $table->foreign('user_id')
                 ->on('users')

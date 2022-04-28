@@ -27,6 +27,7 @@ function companyStatus(string $status): string
 {
     return match ($status) {
         Company::STATUS_ACTIVE => 'منتشر شده',
+        Company::STATUS_REJECT => 'رد شده',
         default => 'درحال بررسی'
     };
 }
@@ -44,6 +45,7 @@ function commentStatus(string $status): string
 {
     return match ($status) {
         Comment::STATUS_ACTIVE => 'منتشر شده',
+        Comment::STATUS_REJECT => 'رد شده',
         default => 'درحال بررسی'
     };
 }
