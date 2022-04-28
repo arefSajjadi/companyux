@@ -47,6 +47,8 @@ class Comment extends Model
     ];
 
     protected $table = 'comments';
+    const STATUS_REJECT = 'reject';
+
 
     protected $fillable = [
         'user_id',

@@ -35,10 +35,30 @@
                     <td>{{$comment->fa_type}}</td>
                     <td>{{$comment->fa_hire}}</td>
                     <td>{!! substr($comment->comment, 0, 130) . ' ...' !!}</td>
-                    <td>{{$comment->fa_status}}</td>
+                    <td>
+                        @switch($comment->status)
+                            @case(\App\Models\Comment::STATUS_ACTIVE) @php($textColor = 'text-success')
+                            @break
+                            @case(\App\Models\Comment::STATUS_WAITING) @php($textColor = 'text-warning')
+                            @break
+                            @case(\App\Models\Comment::STATUS_REJECT) @php($textColor = 'text-danger')
+                            @break
+                            @default @php($textColor = 'text-warning')
+                        @endswitch
+                        <span class="{{$textColor}}">
+                            {{$comment->fa_status}}
+                        </span>
+                    </td>
                     <td>{{convert_date($comment->created_at, true)}}</td>
                     <td>
                         <div class="btn-group btn-group-sm" dir="ltr">
+                            @if ($comment->status !== \App\Models\Comment::STATUS_ACTIVE and !empty($comment->reason))
+                                <a class="btn btn-outline-secondary" title="حذف" data-bs-toggle="modal"
+                                   data-bs-target="#reject-reason{{$comment->id}}" data-backdrop="false">
+                                    <i class="bi-info-circle"></i>
+                                </a>
+                                @include('layouts.comments.rejectReasonModal')
+                            @endif
                             <a class="btn btn-outline-secondary" title="حذف" data-bs-toggle="modal"
                                data-bs-target="#deleteComment{{$comment->id}}" data-backdrop="false">
                                 <i class="bi-trash"></i>
