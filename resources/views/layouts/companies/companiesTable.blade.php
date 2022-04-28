@@ -35,9 +35,29 @@
                     <td>{{$company->establishment_at}}</td>
                     <td>{{$company->industry->title}}</td>
                     <td>{{$company->activeComments()->count()}}</td>
-                    <td>{{$company->fa_status}}</td>
+                    <td>
+                        @switch($company->status)
+                            @case(\App\Models\Company::STATUS_ACTIVE) @php($textColor = 'text-success')
+                            @break
+                            @case(\App\Models\Company::STATUS_WAITING) @php($textColor = 'text-warning')
+                            @break
+                            @case(\App\Models\Company::STATUS_REJECT) @php($textColor = 'text-danger')
+                            @break
+                            @default @php($textColor = 'text-warning')
+                        @endswitch
+                        <span class="{{$textColor}}">
+                            {{$company->fa_status}}
+                        </span>
+                    </td>
                     <td>
                         <div class="btn-group btn-group-sm" dir="ltr">
+                            @if ($company->status === \App\Models\Company::STATUS_REJECT and !empty($company->reason))
+                                <a class="btn btn-outline-secondary" title="حذف" data-bs-toggle="modal"
+                                   data-bs-target="#reject-reason{{$company->id}}" data-backdrop="false">
+                                    <i class="bi-info-circle"></i>
+                                </a>
+                                @include('layouts.companies.rejectReasonModal')
+                            @endif
                             <a class="btn btn-outline-secondary @if ($company->activeComments()->count()) disabled @endif"
                                title="حذف" data-bs-toggle="modal"
                                data-bs-target="#deleteCompany{{$company->id}}" data-backdrop="false">

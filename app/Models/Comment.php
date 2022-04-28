@@ -23,6 +23,7 @@ use Illuminate\Database\Eloquent\SoftDeletes;
  * @property mixed hire
  * @property mixed requested_wage
  * @property mixed received_wage
+ * @property mixed reason
  * @property User user
  * @property Company company
  * Class Comment
@@ -46,6 +47,8 @@ class Comment extends Model
     ];
 
     protected $table = 'comments';
+    const STATUS_REJECT = 'reject';
+
 
     protected $fillable = [
         'user_id',
@@ -57,7 +60,8 @@ class Comment extends Model
         'type',
         'hire',
         'requested_wage',
-        'received_wage'
+        'received_wage',
+        'reason'
     ];
 
     public function getFaTypeAttribute(): string

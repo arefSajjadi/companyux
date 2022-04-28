@@ -26,6 +26,7 @@ return new class extends Migration {
             $table->boolean('hire');
             $table->bigInteger('requested_wage');
             $table->bigInteger('received_wage');
+            $table->text('reason')->nullable();
 
             $table->foreign('user_id')
                 ->on('users')
