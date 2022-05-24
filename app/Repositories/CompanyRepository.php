@@ -18,7 +18,8 @@ class CompanyRepository
             ->where('status', Company::STATUS_ACTIVE)
             ->when(request()->filled('industry'), function (Builder $query) {
                 $query->where('industry_id', request('industry'));
-            })->orderBy('created_at')->paginate($paginate);
+            })->with('industry')
+            ->orderBy('created_at')->paginate($paginate);
     }
 
     public function store(User $user, array $data): Model
