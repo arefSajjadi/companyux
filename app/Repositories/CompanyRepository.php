@@ -13,10 +13,13 @@ class CompanyRepository
 {
     public function index(int $paginate = 30): LengthAwarePaginator
     {
-        return Company::query()->where('status', Company::STATUS_ACTIVE)
+        return Company::query()
+            ->select('id', 'industry_id', 'name', 'brand', 'establishment_at', 'employees', 'url')
+            ->where('status', Company::STATUS_ACTIVE)
             ->when(request()->filled('industry'), function (Builder $query) {
                 $query->where('industry_id', request('industry'));
-            })->orderBy('created_at')->paginate($paginate);
+            })->with('industry')
+            ->orderBy('created_at')->paginate($paginate);
     }
 
     public function store(User $user, array $data): Model

@@ -77,7 +77,7 @@ class CommentController extends Controller
     {
         $this->authorize('update', $comment);
 
-        if ($comment->company_id !== $company->id)
+        if ($comment->company_id != $company->id)
             abort(401);
 
         $data = [
